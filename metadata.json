@@ -1,0 +1,6 @@
+{
+  "name": "Gomu Arena",
+  "description": "2D 16-bit pixel art One Piece action prototype featuring Monkey D. Luffy on a sunny East Blue island with Gomu-Gomu combat abilities and 8-bit chiptune SFX.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
