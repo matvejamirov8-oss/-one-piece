@@ -32,6 +32,20 @@ jobs:
         with:
           gradle-version: ${{ steps.detect.outputs.version }}
 
+      - name: Создать debug.keystore для подписи APK
+        working-directory: ${{ steps.detect.outputs.dir }}
+        run: |
+          if [ ! -f "debug.keystore" ]; then
+            BLOCK=$(grep -A 10 "debugConfig" app/build.gradle.kts 2>/dev/null || true)
+            STORE_PASS=$(echo "$BLOCK" | grep -oP 'storePassword\s*=\s*"\K[^"]+' | head -n 1 || true)
+            KEY_ALIAS=$(echo "$BLOCK" | grep -oP 'keyAlias\s*=\s*"\K[^"]+' | head -n 1 || true)
+            KEY_PASS=$(echo "$BLOCK" | grep -oP 'keyPassword\s*=\s*"\K[^"]+' | head -n 1 || true)
+            STORE_PASS=${STORE_PASS:-android}
+            KEY_ALIAS=${KEY_ALIAS:-androiddebugkey}
+            KEY_PASS=${KEY_PASS:-$STORE_PASS}
+            keytool -genkeypair -keystore debug.keystore -storepass "$STORE_PASS" -alias "$KEY_ALIAS" -keypass "$KEY_PASS" -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+          fi
+
       - name: Собрать Debug APK
         working-directory: ${{ steps.detect.outputs.dir }}
         run: |
